@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Стили компонентов -->
+    <link rel="stylesheet" href="components/Header/Header.css">
+    <link rel="stylesheet" href="components/Products/Products.css">
+    <link rel="stylesheet" href="components/Shopping/Shopping.css">
+    <link rel="stylesheet" href="components/Footer/Footer.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <div id="header"></div>
+
+    <!-- SPA контейнер -->
+    <div id="spa-view"></div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+
+    <!-- JS -->
+    <script src="constants/catalog.js"></script>
+    <script src="constants/root.js"></script>
+    <script src="utils/localStorageUtil.js"></script>
+    <script src="components/Header/Header.js"></script>
+    <script src="components/Products/Products.js"></script>
+    <script src="components/Shopping/Shopping.js"></script>
+    <script src="components/Footer/Footer.js"></script>
+
+    <!-- SPA -->
+    <script>
+        const pages = {
+            home: `
+                <h1>Добро пожаловать!</h1>
+                <p>Это главная страница вашего магазина.</p>
+            `,
+
+            catalog: `
+                <div id="products"></div>
+            `,
+
+            favorites: `
+                <h1>Мои желания</h1>
+                <div id="fav-list"></div>
+            `,
+
+            profile: `
+                <h1>Мой профиль</h1>
+                <div class="profile-box">
+                    <img id="profile-avatar" src="" class="profile-avatar">
+                    <input id="profile-name" placeholder="Имя" />
+                    <button onclick="saveProfileData()">Сохранить</button>
+                </div>
+            `,
+
+            cart: `
+                <div id="shopping"></div>
+            `
+        };
+
+        function renderPage(page) {
+            const container = document.getElementById("spa-view");
+
+            container.className = "page-enter";
+
+            setTimeout(() => {
+                container.innerHTML = pages[page];
+
+                if (page === 'catalog') productsPage.render();
+                if (page === 'cart') shoppingPage.render();
+                if (page === 'profile') loadProfile();
+                if (page === 'favorites') renderFavorites();
+
+                container.className = "page-enter-active";
+            }, 50);
+        }
+
+        renderPage("home"); // Стартовая страница
+    </script>
+
+    <!-- Профиль -->
+    <script>
+        function saveProfileData() {
+            const data = {
+                name: document.getElementById("profile-name").value,
+                avatar: "img/avatar.png"
+            };
+            localStorageUtil.saveProfile(data);
+            alert("Сохранено!");
+        }
+
+        function loadProfile() {
+            const p = localStorageUtil.getProfile();
+            document.getElementById("profile-avatar").src = p.avatar;
+            document.getElementById("profile-name").value = p.name;
+        }
+    </script>
+
+    <!-- Избранное -->
+    <script>
+        function toggleFav(id, el) {
+            const added = localStorageUtil.toggleFavorite(id);
+            el.style.color = added ? "red" : "gray";
+        }
+
+        function renderFavorites() {
+            const fav = localStorageUtil.getFavorites();
+            let html = "";
+
+            CATALOG.forEach(item => {
+                if (fav.includes(item.id)) {
+                    html += `
+                        <div class="fav-item">
+                            <img src="${item.img}" class="fav-img">
+                            <div class="fav-info">
+                                <p>${item.name}</p>
+                                <span>${item.price.toLocaleString()} so'm</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById("fav-list").innerHTML =
+                html || "<p style='opacity:0.6'>Список пуст 😢</p>";
+        }
+    </script>
+
+    <!-- Темная тема -->
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("dark");
+            localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+        }
+
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+        }
+    </script>
+
+</body>
+</html>

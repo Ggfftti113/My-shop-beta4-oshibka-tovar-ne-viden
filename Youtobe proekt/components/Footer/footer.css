@@ -1,0 +1,22 @@
+.footer {
+    background: var(--color-white);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    margin-top: 30px;
+}
+
+.footer-links {
+    margin-top: 10px;
+}
+
+.footer-links a {
+    margin: 0 10px;
+    cursor: pointer;
+    color: var(--color-unaccent);
+    transition: 0.2s;
+}
+
+.footer-links a:hover {
+    color: black;
+}
